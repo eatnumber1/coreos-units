@@ -8,5 +8,5 @@ Restart=on-failure
 EnvironmentFile=/etc/network-environment
 ExecStartPre=-/usr/bin/docker kill %n
 ExecStartPre=-/usr/bin/docker rm %n
-ExecStart=/usr/bin/docker run --name %n -v /etc/localtime:/etc/localtime:ro progrium/ambassadord etcd://${DOCKER0_IPV4}:4001/services/sabnzbd
+ExecStart=/usr/bin/docker run --name %n -v /etc/localtime:/etc/localtime:ro eatnumber1/ambassadord etcd://${DOCKER0_IPV4}:4001/services/sabnzbd
 ExecStop=/usr/bin/docker stop -t 3 %n
