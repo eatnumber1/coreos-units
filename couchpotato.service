@@ -1,0 +1,23 @@
+[Unit]
+Description=CouchPotato Downloader
+
+After=space.mount
+Requires=space.mount
+
+After=sabnzbd.service
+Requires=sabnzbd.service
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=0
+EnvironmentFile=/etc/network-environment
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStartPre=/usr/bin/docker pull needo/couchpotato
+ExecStart=/usr/bin/docker run --name %n -v /space/config/couchpotato:/config -v /space/media/sabnzbd/movies:/downloads -v /space/media/plex/movies:/movies -v /etc/localtime:/etc/localtime:ro --link sabnzbd.service:sabnzbd -p ${DOCKER0_IPV4}:5050:5050 needo/couchpotato
+ExecStop=/usr/bin/docker stop %n
+Restart=always
+RestartSec=10
+
+[X-Fleet]
+X-ConditionMachineOf=sabnzbd.service
