@@ -1,0 +1,23 @@
+[Unit]
+Description=Nginx proxy server
+
+After=loadbal-amb-transmission.service
+Requires=loadbal-amb-transmission.service
+
+After=loadbal-amb-sabnzbd.service
+Requires=loadbal-amb-sabnzbd.service
+
+After=loadbal-amb-nzbdrone.service
+Requires=loadbal-amb-nzbdrone.service
+
+[Service]
+Restart=on-failure
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run --name %n -p 80:80 -p 443:443 --link loadbal-amb-transmission.service:seedbox --link loadbal-amb-sabnzbd.service:usenet --link loadbal-amb-nzbdrone.service:tv -v /etc/localtime:/etc/localtime:ro eatnumber1/nginx-proxy
+ExecStop=/usr/bin/docker stop %n
+
+[X-Fleet]
+X-ConditionMachineOf=loadbal-amb-transmission.service
+X-ConditionMachineOf=loadbal-amb-sabnzbd.service
+X-ConditionMachineOf=loadbal-amb-nzbdrone.service

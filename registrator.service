@@ -1,0 +1,13 @@
+[Unit]
+Description=Container to register services in etcd
+
+[Service]
+Restart=on-failure
+EnvironmentFile=/etc/network-environment
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run --name %n -v /var/run/docker.sock:/tmp/docker.sock -v /etc/localtime:/etc/localtime:ro progrium/registrator etcd://${DOCKER0_IPV4}:4001/services
+ExecStop=/usr/bin/docker stop %n
+
+[X-Fleet]
+Global=true

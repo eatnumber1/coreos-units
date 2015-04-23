@@ -1,0 +1,16 @@
+[Unit]
+Description=Google MusicManager
+After=docker.service
+Requires=docker.service
+After=space.mount
+Requires=space.mount
+After=network.target
+Requires=network.target
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStartPre=/usr/bin/docker pull eatnumber1/google-musicmanager
+ExecStart=/usr/bin/docker run --name %n -e SERVER_NAME=%H -p 5900:5900 -v /space/media/transmission/music:/music:ro -v /space/config/google-musicmanager:/appdata -v /etc/localtime:/etc/localtime:ro eatnumber1/google-musicmanager
+ExecStop=/usr/bin/docker stop %n

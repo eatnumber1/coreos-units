@@ -1,0 +1,16 @@
+[Unit]
+Description=Plex media server
+After=docker.service
+Requires=docker.service
+After=space.mount
+Requires=space.mount
+After=network.target
+Requires=network.target
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStartPre=/usr/bin/docker pull eatnumber1/plexpass
+ExecStart=/usr/bin/docker run --name %n -p 32400:32400 -v /space/config/plex:/config -v /space/media/plex:/data:ro -v /etc/localtime:/etc/localtime:ro eatnumber1/plexpass
+ExecStop=/usr/bin/docker stop %n

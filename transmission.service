@@ -1,0 +1,15 @@
+[Unit]
+Description=Transmission torrent client
+
+After=space.mount
+Requires=space.mount
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=0
+EnvironmentFile=/etc/network-environment
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+#ExecStartPre=/usr/bin/docker pull cptactionhank/transmission
+ExecStart=/usr/bin/docker run --name %n -p ${DOCKER0_IPV4}:9091:9091 -p 51413:51413 -p 51413:51413/udp -v /space/media/transmission:/var/lib/transmission-daemon/downloads -v /space/config/transmission:/var/lib/transmission-daemon/info -v /space/tmp/transmission:/var/lib/transmission-daemon/incomplete -v /etc/localtime:/etc/localtime:ro cptactionhank/transmission
+ExecStop=/usr/bin/docker stop %n

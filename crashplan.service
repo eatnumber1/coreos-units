@@ -1,0 +1,13 @@
+[Unit]
+Description=CrashPlan Backups
+
+After=space.mount
+Requires=space.mount
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStart=/usr/bin/docker run --name %n -p 4242:4242 -p 4243:4243 -h %H -v /space/config/crashplan:/data -v /space:/backups -v /etc/localtime:/etc/localtime:ro -e MAX_MEMORY_MB=1024 aostanin/crashplan
+ExecStop=/usr/bin/docker stop %n

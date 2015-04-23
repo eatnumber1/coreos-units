@@ -1,0 +1,27 @@
+[Unit]
+Description=NZBDrone PVR
+
+After=space.mount
+Requires=space.mount
+
+After=sabnzbd.service
+Requires=sabnzbd.service
+
+Requires=plex.service
+After=plex.service
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=0
+EnvironmentFile=/etc/network-environment
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStartPre=/usr/bin/docker pull aostanin/nzbdrone
+ExecStart=/usr/bin/docker run --name %n -v /space/config/nzbdrone:/data -v /space/media/sabnzbd:/downloads -v /space/media/plex:/plex -v /etc/localtime:/etc/localtime:ro --link sabnzbd.service:sabnzbd --link plex.service:plex -p ${DOCKER0_IPV4}:8989:8989 aostanin/nzbdrone
+ExecStop=/usr/bin/docker stop %n
+Restart=always
+RestartSec=10
+
+[X-Fleet]
+X-ConditionMachineOf=sabnzbd.service
+X-ConditionMachineOf=plex.service

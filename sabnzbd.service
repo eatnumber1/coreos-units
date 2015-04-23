@@ -1,0 +1,17 @@
+[Unit]
+Description=SabNZBd usenet downloader
+
+After=space.mount
+Requires=space.mount
+
+[Service]
+Restart=on-failure
+TimeoutStartSec=0
+EnvironmentFile=/etc/network-environment
+ExecStartPre=-/usr/bin/docker kill %n
+ExecStartPre=-/usr/bin/docker rm %n
+ExecStartPre=/usr/bin/docker pull needo/sabnzbd
+ExecStartPre=/usr/bin/mkdir -p /space/config/sabnzbd
+ExecStartPre=/usr/bin/chown 99 /space/config/sabnzbd
+ExecStart=/usr/bin/docker run --name %n -p ${DOCKER0_IPV4}:8080:8080 -v /space/config/sabnzbd:/config -v /space/media/sabnzbd:/downloads -v /space/tmp/sabnzbd:/incomplete -v /etc/localtime:/etc/localtime:ro needo/sabnzbd
+ExecStop=/usr/bin/docker stop %n
